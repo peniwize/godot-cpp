@@ -197,7 +197,7 @@ if env['platform'] == 'linux' or env['platform'] == 'freebsd':
     env.Append(LINKFLAGS=["-Wl,-R,'$$ORIGIN'"])
 
     if env['target'] == 'debug':
-        env.Append(CCFLAGS=['-Og', '-g'])
+        env.Append(CCFLAGS=['-fno-omit-frame-pointer', '-O0', '-Og', '-ggdb', '-g3', '-fno-inline-small-functions', '-fno-inline', '-fkeep-inline-functions', '-fno-default-inline', '-fno-inline-functions', '-fno-inline-functions-called-once', '-fno-inline-small-functions', '-finline-limit=0', '-fkeep-inline-functions'])
     elif env['target'] == 'release':
         env.Append(CCFLAGS=['-O3'])
 
@@ -444,12 +444,24 @@ if env['platform'] == 'ios':
 if env['platform'] == 'javascript':
     arch_suffix = 'wasm'
 
-library = env.StaticLibrary(
-    target='bin/' + 'libgodot-cpp.{}.{}.{}{}'.format(
-        env['platform'],
-        env['target'],
-        arch_suffix,
-        env['LIBSUFFIX']
-    ), source=sources
-)
+build_static_library = False # True
+
+if build_static_library:
+	library = env.StaticLibrary(
+	    target='bin/' + 'libgodot-cpp.{}.{}.{}{}'.format(
+	        env['platform'],
+	        env['target'],
+	        arch_suffix,
+	        env['LIBSUFFIX']
+	    ), source=sources
+	)
+else:
+	library = env.SharedLibrary(
+	    target='bin/' + 'libgodot-cpp.{}.{}.{}{}'.format(
+	        env['platform'],
+	        env['target'],
+	        arch_suffix,
+	        env['SHLIBSUFFIX']
+	    ), source=sources
+	)
 Default(library)
